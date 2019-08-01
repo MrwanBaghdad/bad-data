@@ -9,7 +9,7 @@ There are three offerings:
   or   sql. The video showcased how to apply unsupervised learning algorithm random forest and setup pumbs  
   * [AWS data Firehose](https://aws.amazon.com/kinesis/data-firehose) - Managed service to move events to AWS data stores( AWS S3, AWS redshift ..etc)
   
-* [AWS lambda] - Can be used to offer data transformation beyond what's availabel in SQL think (Calling external APIs for enriching the events).
+* [AWS lambda](https://aws.amazon.com/lambda/) - Can be used to offer data transformation beyond what's availabel in SQL think (Calling external APIs for enriching the events).
 The lambda functions acts as puller consuming events as soon as it's available in the stream.
  
 * [AWS glue data cataloge](https://docs.aws.amazon.com/glue/latest/dg/populate-data-catalog.html): AWS glue is an ETL framework for running and manting ETL jobs. 
