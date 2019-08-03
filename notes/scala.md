@@ -216,7 +216,9 @@ detect non exhaustive _match blocks_. Allowing for a more safe pattern matching 
 
 ### Algebric data types 
 ```
-Data types defined with sealed trait and case classes are called algebraic data types. An algebraic data type definition can be thought of as a set of possible values.
+Data types defined with sealed trait and case classes are called algebraic data types. 
+
+An algebraic data type definition can be thought of as a set of possible values.
 ```
 **If a concept of your program’s domain can be formulated in terms of an is relationship, you will express it with a sealed trait**
 
