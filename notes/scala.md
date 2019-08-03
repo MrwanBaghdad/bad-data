@@ -128,5 +128,97 @@ def fib(x: Int): Int =
 add the `@tailrec` to the method definition**
 
 
+## Structuring information 
+### Case classes 
+A case class resembles a named tuple in python. It's used to encapsulate values within the same context or 
+or derived from same context 
 
+```scala 
+case class Person(firstName: String, lastName: String, age: Int)
+val person1 = Person("Marwan", "Nabil", 24)
+person1.firstName // = "Marwan"
+person1.age = 24 // = 24
+```
+### Sealed traits 
+
+One could group classes using traits. A trait can be explained like a mash between 
+enums and interfaces. 
+
+* Sealed is just a modifier that's can be best explained that it mimics the `private` modifier in Java. 
+Applying it to a trait that only objects defined in the same file can _extend_ that trait. 
+
+So in above example we can define a trait called a `Being` which has an alternative - note the wording think of it as an enum - `Person`
+
+```scala 
+sealed trait Being 
+case class Person( firstName: String, lastName: String, age: Int) extends Symbol 
+case class Animal (petName: String, age: Name) extends Symbol 
+
+val person1: Symbol = Person("Marwan", "Nabil", 23)
+val animal1: Symnbol = Animal("Blue", 12)
+```
+
+### Pattern matching 
+
+Pattern matching is method kind of a complicated (if-else) paradigm, we can use pattern matching to differentiate between:
+
+* values 
+```scala
+def matchTest(x: Int): String = x match {
+  case 1 => "one"
+  case 2 => "two"
+  case _ => "other"
+}
+matchTest(3)  // other
+matchTest(1)  // one
+```
+
+* case classes
+```scala
+def symbolDuration(symbol: Symbol): String =
+  symbol match {
+    case Note(name, duration, octave) => duration
+    case Rest(duration) => duration
+  }
+```
+* types (classes)
+```scala
+abstract class Device
+case class Phone(model: String) extends Device {
+  def screenOff = "Turning screen off"
+}
+case class Computer(model: String) extends Device {
+  def screenSaverOn = "Turning screen saver on..."
+}
+
+def goIdle(device: Device) = device match {
+  case p: Phone => p.screenOff
+  case c: Computer => c.screenSaverOn
+}
+```
+* types with guards 
+```scala
+def showImportantNotification(notification: Notification, importantPeopleInfo: Seq[String]): String = {
+  notification match {
+    case Email(sender, _, _) if importantPeopleInfo.contains(sender) =>
+      "You got an email from special someone!"
+    case SMS(number, _) if importantPeopleInfo.contains(number) =>
+      "You got an SMS from special someone!"
+    case other =>
+      showNotification(other) // nothing special, delegate to our original showNotification function
+  }
+}
+```
+### pattern mathcing with sealead traits 
+
+Since a sealed trait can has all its _alternatives_ (definitions) in the same file. The compiler can 
+detect non exhaustive _match blocks_. Allowing for a more safe pattern matching block. 
+
+### Algebric data types 
+```
+Data types defined with sealed trait and case classes are called algebraic data types. An algebraic data type definition can be thought of as a set of possible values.
+```
+**If a concept of your program’s domain can be formulated in terms of an is relationship, you will express it with a sealed trait**
+
+**On the other hand, if a concept of your program’s domain can be formulated in terms of an has relationship, you will express it with a case class:**
 
