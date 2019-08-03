@@ -108,9 +108,10 @@ def fib(x: Int): Int =
  > 4 * 3 * 2 * fib(1) 
  > 4 * 3 * 2 * 1 
  > 24 
+ ```
  The recursion is at the _tail_ which is the most right hand side of the expression adding to the space 
  size of the evaluation to get contrasting this to 
- 
+
  ```scala 
  def factorial(n: Int): Int = {
   @tailrec
@@ -125,6 +126,7 @@ def fib(x: Int): Int =
 
 **By default all recursive functions are optimized to set that function is tail-recursive 
 add the `@tailrec` to the method definition**
+
 
 
 
