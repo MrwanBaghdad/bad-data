@@ -94,5 +94,37 @@ object MyExecutableProgram {
 }
 ```
 
+## Recursive function application 
+### Tail recursion 
+
+The fibpnnaci seires implementation 
+``scala
+def fib(x: Int): Int = 
+ if (x == 1) x else x * fib(x - 1)
+ ``` 
+ For fib(4) it's evaluated to 
+ > 4 * (fib(3))
+ > 4 * 3 * fib(2))
+ > 4 * 3 * 2 * fib(1) 
+ > 4 * 3 * 2 * 1 
+ > 24 
+ The recursion is at the _tail_ which is the most right hand side of the expression adding to the space 
+ size of the evaluation to get contrasting this to 
+ 
+ ```scala 
+ def factorial(n: Int): Int = {
+  @tailrec
+  def iter(x: Int, result: Int): Int =
+    if (x == 1) result
+    else iter(x -  1, result * x)
+
+  iter(n, 1)
+}
+ ```
+ This will add the get the recursion to be not tail-recursive one. 
+
+**By default all recursive functions are optimized to set that function is tail-recursive 
+add the `@tailrec` to the method definition**
+
 
 
