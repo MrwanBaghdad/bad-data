@@ -224,3 +224,131 @@ An algebraic data type definition can be thought of as a set of possible values.
 
 **On the other hand, if a concept of your program’s domain can be formulated in terms of an has relationship, you will express it with a case class:**
 
+
+### Higher order functions 
+
+Functional languages treats functions as first-class objects. That they can be defined without
+being encapsulated in objects. _No need for the command pattern here_ 
+One feature that you get from having functions defined as that that they can be passed to other 
+functions and be used to return other functions _think function decorators_ 
+
+Consider the following example,
+
+```scala 
+def sumInts(a: Int, b:Int): Int = 
+ if ( a > b) 0 else a + sumInts(a + 1, b)
+```
+But what if we want to get the sum of cubes for a range between `a` and `b`
+
+```scala
+def cube(x: Int): Int = x*x*x 
+
+def sumCubes(a: Int, b: Int): Int = 
+ if (a > b) 0 else a + sumCubes(a + 1, b) 
+```
+The above code isn't very dry the same functionality can be expressed with using the `sumInts` using 
+higher order functions. 
+
+Refacoting the `sumInts` to accept a function to apply we need to define the function signature which
+is a linear function that takes and return an integer 
+
+```scala
+def sum(f: Int => Int, a: Int, b: Int): Int =
+ if (a > b) 0 else f(a) + sum(f, a+1, b) 
+```
+We can then re-write the `sumInts` and `sumCube` to be: 
+
+```scala
+def cube(x: Int): Int = x*x*x
+def sumCube(a: Int, b:Int) = sum(cube, a, b)
+
+def id(x: Int): Int = x 
+def sumInts(a: Int, b:Int) = sum(id, a, b)
+
+```
+
+### Anonymous functions 
+
+* Anonymous functions syntax: 
+ ```scala 
+ (x :Int) => x * x * x
+ ```
+
+Creating and naming small lambda functions can be tedious to overcome this 
+we can use then anonymous functions to re-write the above 
+
+```scala 
+def sumCubes(a: Int, b: Int) = sum(x => x * x * x, a, b)
+def sumInts(a: Int, b: Int) = sum(x => x, a, b)
+```
+
+### Standard library 
+
+#### Lists 
+
+In scala lists are homogenous, recursive and immutable
+
+```scala 
+val fruits: List[String] = List("apple", "oranges", "pears")
+val nums = List(1, 2, 3, 4)
+val diag3: List[List[Int]] = List(List(1, 0, 0), List(0, 1, 0), List(0, 0, 1))
+```
+Lists are all a composed from the empty list `Nil` 
+
+```scala 
+val emptyList1 = List()
+val emptyList2 = Nil 
+```
+
+Lists are composed using cons `::` `x :: xs` gives a new list with first element `x` 
+cons assossiate to the right. thus
+
+Example
+
+```scala 
+val fruits = "oranges" :: "apples" :: "pears" :: Nil 
+val fruits = Nil.::("pears").::("apples").::("oranges")
+```
+
+* Pattern matching on lists:
+ 
+ ```scala
+ nums match {
+  // Lists of `Int` that starts with `1` and then `2`
+  case 1 :: 2 :: xs => …
+  
+  // Lists of length 1
+  case x :: Nil => …
+  
+  // Same as `x :: Nil`
+  case List(x) => …
+  
+  // The empty list, same as `Nil`
+  case List() =>
+  
+  // A list that contains as only element another list that starts with `2`
+  case List(2 :: xs) => …
+}
+```
+ 
+ #### Common operations on list 
+ 
+`map`, `filter` and `flatMap`
+ 
+```scala 
+//map 
+List(1, 2, 3).map( x => x + 1) == List(2, 3, 4)
+ 
+//filter 
+List(1, 2, 3).filter( x => x % 2 == 0 ) == List(2) 
+ 
+//flatMap: transfomr each element into a list and aggregate and finally flaten 
+
+val xs = 
+List(1, 2, 3).flatMap { x => 
+ List(x, 2 * x, 3 * x)
+ 
+ xs == List(1, 2, 3, 2, 4, 6, 3, 6 , 9) 
+ 
+```
+
