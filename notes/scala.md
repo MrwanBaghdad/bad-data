@@ -352,3 +352,170 @@ List(1, 2, 3).flatMap { x =>
  
 ```
 
+### Optional values 
+
+Sometime we're not sure that a function would return a vible value of type [T] 
+To get over this scala introduce the Optional type defined as `Option[T]` 
+
+```scala
+def sqrt(x: Double): Option[Double] = if (x < 0) None else Some(...)
+```
+[Option, some and none relation](https://stackoverflow.com/a/27656556)
+#### Manipulation options AKA using optional values with pattern matching 
+
+```scala 
+def foo(x: Double) : String = 
+ sqrt(x) match {
+  case None: "Not a value" 
+  case Some(x): x.toString
+ }
+```
+
+#### Common operations on list 
+
+```scala 
+Some(1).map( x => x + 1) == Some(2) 
+None.map((x:Int) => x + 1 ) == None 
+```
+
+### Error handling - Try[A] 
+
+Try is a type it can be used to create a list of operations output that would be then passed to 
+a block that matches handles the errors. 
+
+```scala 
+def sqrt(x: Int): Try[Double] = if (x < 0) Failure(new IllegalArgumentException("x must be positive")) else
+ Success(...)
+```
+
+### Either 
+
+Either can also be usedto handle failures. Basically, the type `Either[A, B]` .
+You can use one case to represent the failure and the other to represent the sucess. One difference with `Try` is that you choose another type than throwable to represent the exception. 
+
+Another difference is that exceptions that occur when transforming `Either` values are not converted into failures.
+
+`Either` has `flatMap`, `flat`, and also `filterOrElse` that turns a `Right` value into a `Left` value if it does not statisfy a given predicate. 
+
+```scala 
+Right(1).filterOrElse(x => x % 2 == ), "Odd value") == Left("Odd value")
+```
+
+### Some, Try, and Either 
+
+`Some` -  value checks and error handling for domain and showing that state can be unknown 
+`Try` - Operational errors and logical errors 
+`Either` - Can be used for recursion branching?? Or a last step error handling 
+
+`Try` can be though of as `Either[Throwable, Int]` the convention is to use the `Left` for errors and `Right` for correct values. 
+
+## Syntactic conveniences 
+
+### String Interpolation 
+
+To splice values into constant `String` at runtime. you can use string interpolation. 
+add `s` at start of string and `$` to indicate the value.
+
+```scala 
+def greet(name: String): String = 
+ s"Hello, $name"
+```
+
+If you want to add expression surround it with braces. 
+```scala
+def greet(name: String): String = 
+ s"Hello, ${name.toUpperCase}"
+ ```
+ 
+### Tuples 
+
+Case classes are named tuples if you want to return unnamed tuples you can use the following syntax.
+
+```scala 
+def pair(x: Int, s:String): (Int, String) = (x, s)
+
+pair(2, "Hello") == (2, "Hello") 
+```
+
+### `FOR` expressions 
+
+Every function is defined as trait in the `scala` package as follows
+
+```scala
+xs.map(x => x + 1)
+for (x <- xs) yield x + 1
+
+xs.filter(x => x % 2 == 0).map( x => x + 1)
+for (x <- xs if x % 2 == 0) yield x  + 1
+```
+
+`flatMap`
+
+```scala
+xs.flatMap(x => ys.map(y => (x, y)))
+for (x <- xs; y <- ys) yield (x, y)
+```
+
+## Scala OOP 
+
+To create an object the `class` prefix is used this initiate the name and the type 
+
+A new type, named `Rational` 
+A constructor `Rational` to create elements of this type
+
+
+```scala 
+
+class Rational(x: Int, y:Int) {
+ def numer = x
+ def denom = y
+}
+
+val r1 = new Rational(1, 2)
+
+r1.numer == 1 
+r1.denom == 2
+
+```
+Defining methods is to create functions in the class scope/code block 
+
+```scala 
+class Rational(x :Int, y: Int) {
+  def numer = x
+  def denom = y
+  def mul(x: Rational, y:Rational) = new Rational(this.x * x / (this.y*y)
+}
+```
+
+The `ovverride` is used to redefine a function pre-defined in a parent class 
+
+```scala 
+class Rational(x: Int, y:Int){
+this.x = x
+this.y = y
+override toString: String = s"$x / $y"
+```
+
+We can use `require` to define parameter conditions failing to meet the required conditional will results in an `IllegealArgumentException` thrown.
+
+```scala 
+class Rational(x: Int, y:Int){
+require(y > 0, "defnominator must be positive")
+}
+```
+
+### Assestions vs Require
+
+* Asseritions : Throws an `AsserstionError` Assertiona are used to check the code of the function iteself and its return values
+* require: Throws an `IllegealArgumentException`, is to enforce preconditions on the caller functions
+
+
+### Auxliery constructors 
+
+You can think of constructor overloading 
+
+```scala 
+class Ratoinal(x: Int, y:Int) { 
+ def this(x: Int) = this (x, 1) //this is the actual constructor  
+ 
+}
