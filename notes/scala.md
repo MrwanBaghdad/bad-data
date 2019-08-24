@@ -224,3 +224,298 @@ An algebraic data type definition can be thought of as a set of possible values.
 
 **On the other hand, if a concept of your program’s domain can be formulated in terms of an has relationship, you will express it with a case class:**
 
+
+### Higher order functions 
+
+Functional languages treats functions as first-class objects. That they can be defined without
+being encapsulated in objects. _No need for the command pattern here_ 
+One feature that you get from having functions defined as that that they can be passed to other 
+functions and be used to return other functions _think function decorators_ 
+
+Consider the following example,
+
+```scala 
+def sumInts(a: Int, b:Int): Int = 
+ if ( a > b) 0 else a + sumInts(a + 1, b)
+```
+But what if we want to get the sum of cubes for a range between `a` and `b`
+
+```scala
+def cube(x: Int): Int = x*x*x 
+
+def sumCubes(a: Int, b: Int): Int = 
+ if (a > b) 0 else a + sumCubes(a + 1, b) 
+```
+The above code isn't very dry the same functionality can be expressed with using the `sumInts` using 
+higher order functions. 
+
+Refacoting the `sumInts` to accept a function to apply we need to define the function signature which
+is a linear function that takes and return an integer 
+
+```scala
+def sum(f: Int => Int, a: Int, b: Int): Int =
+ if (a > b) 0 else f(a) + sum(f, a+1, b) 
+```
+We can then re-write the `sumInts` and `sumCube` to be: 
+
+```scala
+def cube(x: Int): Int = x*x*x
+def sumCube(a: Int, b:Int) = sum(cube, a, b)
+
+def id(x: Int): Int = x 
+def sumInts(a: Int, b:Int) = sum(id, a, b)
+
+```
+
+### Anonymous functions 
+
+* Anonymous functions syntax: 
+ ```scala 
+ (x :Int) => x * x * x
+ ```
+
+Creating and naming small lambda functions can be tedious to overcome this 
+we can use then anonymous functions to re-write the above 
+
+```scala 
+def sumCubes(a: Int, b: Int) = sum(x => x * x * x, a, b)
+def sumInts(a: Int, b: Int) = sum(x => x, a, b)
+```
+
+### Standard library 
+
+#### Lists 
+
+In scala lists are homogenous, recursive and immutable
+
+```scala 
+val fruits: List[String] = List("apple", "oranges", "pears")
+val nums = List(1, 2, 3, 4)
+val diag3: List[List[Int]] = List(List(1, 0, 0), List(0, 1, 0), List(0, 0, 1))
+```
+Lists are all a composed from the empty list `Nil` 
+
+```scala 
+val emptyList1 = List()
+val emptyList2 = Nil 
+```
+
+Lists are composed using cons `::` `x :: xs` gives a new list with first element `x` 
+cons assossiate to the right. thus
+
+Example
+
+```scala 
+val fruits = "oranges" :: "apples" :: "pears" :: Nil 
+val fruits = Nil.::("pears").::("apples").::("oranges")
+```
+
+* Pattern matching on lists:
+ 
+ ```scala
+ nums match {
+  // Lists of `Int` that starts with `1` and then `2`
+  case 1 :: 2 :: xs => …
+  
+  // Lists of length 1
+  case x :: Nil => …
+  
+  // Same as `x :: Nil`
+  case List(x) => …
+  
+  // The empty list, same as `Nil`
+  case List() =>
+  
+  // A list that contains as only element another list that starts with `2`
+  case List(2 :: xs) => …
+}
+```
+ 
+ #### Common operations on list 
+ 
+`map`, `filter` and `flatMap`
+ 
+```scala 
+//map 
+List(1, 2, 3).map( x => x + 1) == List(2, 3, 4)
+ 
+//filter 
+List(1, 2, 3).filter( x => x % 2 == 0 ) == List(2) 
+ 
+//flatMap: transfomr each element into a list and aggregate and finally flaten 
+
+val xs = 
+List(1, 2, 3).flatMap { x => 
+ List(x, 2 * x, 3 * x)
+ 
+ xs == List(1, 2, 3, 2, 4, 6, 3, 6 , 9) 
+ 
+```
+
+### Optional values 
+
+Sometime we're not sure that a function would return a vible value of type [T] 
+To get over this scala introduce the Optional type defined as `Option[T]` 
+
+```scala
+def sqrt(x: Double): Option[Double] = if (x < 0) None else Some(...)
+```
+[Option, some and none relation](https://stackoverflow.com/a/27656556)
+#### Manipulation options AKA using optional values with pattern matching 
+
+```scala 
+def foo(x: Double) : String = 
+ sqrt(x) match {
+  case None: "Not a value" 
+  case Some(x): x.toString
+ }
+```
+
+#### Common operations on list 
+
+```scala 
+Some(1).map( x => x + 1) == Some(2) 
+None.map((x:Int) => x + 1 ) == None 
+```
+
+### Error handling - Try[A] 
+
+Try is a type it can be used to create a list of operations output that would be then passed to 
+a block that matches handles the errors. 
+
+```scala 
+def sqrt(x: Int): Try[Double] = if (x < 0) Failure(new IllegalArgumentException("x must be positive")) else
+ Success(...)
+```
+
+### Either 
+
+Either can also be usedto handle failures. Basically, the type `Either[A, B]` .
+You can use one case to represent the failure and the other to represent the sucess. One difference with `Try` is that you choose another type than throwable to represent the exception. 
+
+Another difference is that exceptions that occur when transforming `Either` values are not converted into failures.
+
+`Either` has `flatMap`, `flat`, and also `filterOrElse` that turns a `Right` value into a `Left` value if it does not statisfy a given predicate. 
+
+```scala 
+Right(1).filterOrElse(x => x % 2 == ), "Odd value") == Left("Odd value")
+```
+
+### Some, Try, and Either 
+
+`Some` -  value checks and error handling for domain and showing that state can be unknown 
+`Try` - Operational errors and logical errors 
+`Either` - Can be used for recursion branching?? Or a last step error handling 
+
+`Try` can be though of as `Either[Throwable, Int]` the convention is to use the `Left` for errors and `Right` for correct values. 
+
+## Syntactic conveniences 
+
+### String Interpolation 
+
+To splice values into constant `String` at runtime. you can use string interpolation. 
+add `s` at start of string and `$` to indicate the value.
+
+```scala 
+def greet(name: String): String = 
+ s"Hello, $name"
+```
+
+If you want to add expression surround it with braces. 
+```scala
+def greet(name: String): String = 
+ s"Hello, ${name.toUpperCase}"
+ ```
+ 
+### Tuples 
+
+Case classes are named tuples if you want to return unnamed tuples you can use the following syntax.
+
+```scala 
+def pair(x: Int, s:String): (Int, String) = (x, s)
+
+pair(2, "Hello") == (2, "Hello") 
+```
+
+### `FOR` expressions 
+
+Every function is defined as trait in the `scala` package as follows
+
+```scala
+xs.map(x => x + 1)
+for (x <- xs) yield x + 1
+
+xs.filter(x => x % 2 == 0).map( x => x + 1)
+for (x <- xs if x % 2 == 0) yield x  + 1
+```
+
+`flatMap`
+
+```scala
+xs.flatMap(x => ys.map(y => (x, y)))
+for (x <- xs; y <- ys) yield (x, y)
+```
+
+## Scala OOP 
+
+To create an object the `class` prefix is used this initiate the name and the type 
+
+A new type, named `Rational` 
+A constructor `Rational` to create elements of this type
+
+
+```scala 
+
+class Rational(x: Int, y:Int) {
+ def numer = x
+ def denom = y
+}
+
+val r1 = new Rational(1, 2)
+
+r1.numer == 1 
+r1.denom == 2
+
+```
+Defining methods is to create functions in the class scope/code block 
+
+```scala 
+class Rational(x :Int, y: Int) {
+  def numer = x
+  def denom = y
+  def mul(x: Rational, y:Rational) = new Rational(this.x * x / (this.y*y)
+}
+```
+
+The `ovverride` is used to redefine a function pre-defined in a parent class 
+
+```scala 
+class Rational(x: Int, y:Int){
+this.x = x
+this.y = y
+override toString: String = s"$x / $y"
+```
+
+We can use `require` to define parameter conditions failing to meet the required conditional will results in an `IllegealArgumentException` thrown.
+
+```scala 
+class Rational(x: Int, y:Int){
+require(y > 0, "defnominator must be positive")
+}
+```
+
+### Assestions vs Require
+
+* Asseritions : Throws an `AsserstionError` Assertiona are used to check the code of the function iteself and its return values
+* require: Throws an `IllegealArgumentException`, is to enforce preconditions on the caller functions
+
+
+### Auxliery constructors 
+
+You can think of constructor overloading 
+
+```scala 
+class Ratoinal(x: Int, y:Int) { 
+ def this(x: Int) = this (x, 1) //this is the actual constructor  
+ 
+}
