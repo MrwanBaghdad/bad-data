@@ -1,6 +1,6 @@
 # Building your first big data app 
 
-## Technologies mentioned:
+## Technologies mentioned::
 
 * [AWS Kinesis](https://aws.amazon.com/kinesis) - AWS  Kinese is an easy to setup managed service to handle events streams.
 There are three offerings: 
